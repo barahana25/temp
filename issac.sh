@@ -41,7 +41,7 @@ conda create -y -n isaaclab3 python=3.12
 conda activate isaaclab3
 
 pip install --upgrade pip
-# lazy_loader 누락 에러 방지를 위한 사전 설치
+# 의존성 모듈 사전 설치
 pip install lazy_loader
 
 pip install "isaacsim[all,extscache]==6.1.0" --extra-index-url https://pypi.nvidia.com
@@ -51,7 +51,15 @@ cd ~
 git clone --recursive -b release/3.0.0 https://github.com/isaac-sim/IsaacLab IsaacLab3
 cd IsaacLab3
 export OMNI_KIT_ACCEPT_EULA=YES
+
+# Isaac Lab 기본 설치
 ./isaaclab.sh --install
+
+# 모듈 인식을 위한 확장 패키지 editable 모드 설치 (isaaclab_newton 등 누락 방지)
+pip install -e source/extensions/omni.isaac.lab
+pip install -e source/extensions/omni.isaac.lab_tasks
+pip install -e source/extensions/omni.isaac.lab_assets
+
 echo "===== 설치 완료 ====="
 )
 
