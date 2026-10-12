@@ -21,16 +21,16 @@ fi
 export PATH="$HOME/miniconda3/bin:$PATH"
 eval "$(conda shell.bash hook)"
 
-# Conda 약관 동의 및 기본 채널 설정 (약관 및 메인 채널 이슈 방지)
-conda config --set accept_tos yes 2>/dev/null || true
+# 약관 동의 관련 conda 설정 적용
+conda config --set auto_accept_tos yes 2>/dev/null || true
 conda config --add channels conda-forge 2>/dev/null || true
 conda config --set channel_priority strict 2>/dev/null || true
 
 # 2. 시스템 패키지 업데이트 및 기본 도구 설치
 sudo apt update && sudo apt install -y cmake build-essential git git-lfs
 
-# 3. Conda 환경 구축 (약관 자동 동의 플래그 포함) 및 Isaac Lab 설치
-conda create -y --accept-tos -n isaaclab3 python=3.12
+# 3. Conda 환경 구축 및 Isaac Lab 설치
+conda create -y -n isaaclab3 python=3.12
 conda activate isaaclab3
 
 pip install --upgrade pip
