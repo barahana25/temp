@@ -8,7 +8,7 @@ if [ -d "$HOME/IsaacLab3" ]; then
     rm -rf ~/IsaacLab3
 fi
 
-# 2. Miniconda 설치 및 기존 Conda 경로 감지
+# 2. Miniconda 설치 및 경로 감지
 CONDA_DIR=""
 if [ -d "$HOME/miniconda3" ]; then
     CONDA_DIR="$HOME/miniconda3"
@@ -42,28 +42,26 @@ conda config --set channel_priority strict 2>/dev/null || true
 # 3. 시스템 패키지 업데이트 및 기본 도구 설치
 sudo apt update && sudo apt install -y cmake build-essential git git-lfs
 
-# 4. Conda 환경 구축 및 Isaac Lab 설치
+# 4. 기존 에러 환경 재생성 (깨끗한 상태로 재시작)
+conda env remove -n isaaclab3 -y 2>/dev/null || true
 conda create -y -n isaaclab3 python=3.12
 conda activate isaaclab3
 
 pip install --upgrade pip
 pip install lazy_loader
 
+# 5. Isaac Sim 및 안정 버전 PyTorch 설치 (PyTorch 2.5.1 / CUDA 12.4 사용으로 nccl 오류 해결)
 pip install "isaacsim[all,extscache]==6.1.0" --extra-index-url https://pypi.nvidia.com
-pip install -U torch==2.10.0 torchvision==0.25.0 --index-url https://download.pytorch.org/whl/cu128
+pip install -U torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu124
 
+# 6. IsaacLab3 소스 다운로드 및 설치
 cd ~
 git clone --recursive -b release/3.0.0 https://github.com/isaac-sim/IsaacLab IsaacLab3
 cd IsaacLab3
 export OMNI_KIT_ACCEPT_EULA=YES
 
-# Isaac Lab 기본 설치 및 하위 확장 모듈(isaaclab_newton 포함) 전수 editable 설치
+# Isaac Lab core 및 확장 모듈 순차 설치
 ./isaaclab.sh --install
-pip install -e source/extensions/omni.isaac.lab
-pip install -e source/extensions/omni.isaac.lab_tasks
-pip install -e source/extensions/omni.isaac.lab_assets
-pip install -e source/extensions/omni.isaac.lab_newton 2>/dev/null || true
-pip install -e source/extensions/isaaclab_newton 2>/dev/null || true
 
 echo "===== 설치 완료 ====="
 )
