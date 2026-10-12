@@ -9,17 +9,28 @@ if ! command -v conda &> /dev/null; then
     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
     bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
     rm ~/miniconda3/miniconda.sh
-    eval "$(~/miniconda3/bin/conda shell.bash hook)"
+    
+    # 터미널 재시작 없이 즉시 conda 사용을 위한 PATH 추가
+    export PATH="$HOME/miniconda3/bin:$PATH"
+    eval "$(conda shell.bash hook)"
     conda init bash
     echo "===== Miniconda 설치 완료 ====="
 fi
 
+# PATH 및 쉘 훅 보장
+export PATH="$HOME/miniconda3/bin:$PATH"
+eval "$(conda shell.bash hook)"
+
+# Conda 약관 동의 및 기본 채널 설정 (약관 및 메인 채널 이슈 방지)
+conda config --set accept_tos yes 2>/dev/null || true
+conda config --add channels conda-forge 2>/dev/null || true
+conda config --set channel_priority strict 2>/dev/null || true
+
 # 2. 시스템 패키지 업데이트 및 기본 도구 설치
 sudo apt update && sudo apt install -y cmake build-essential git git-lfs
 
-# 3. Conda 환경 구축 및 Isaac Lab 설치
-eval "$(conda shell.bash hook)"
-conda create -y -n isaaclab3 python=3.12
+# 3. Conda 환경 구축 (약관 자동 동의 플래그 포함) 및 Isaac Lab 설치
+conda create -y --accept-tos -n isaaclab3 python=3.12
 conda activate isaaclab3
 
 pip install --upgrade pip
@@ -35,6 +46,7 @@ echo "===== 설치 완료 ====="
 )
 
 ## 설치확인
+eval "$(conda shell.bash hook)"
 conda activate isaaclab3
 cd ~/IsaacLab3
 export OMNI_KIT_ACCEPT_EULA=YES
