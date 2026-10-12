@@ -2,7 +2,13 @@
 (
 set -e
 
-# 1. Miniconda 설치 및 기존 Conda 경로 감지
+# 1. 기존 IsaacLab3 디렉토리가 있다면 깔끔히 삭제
+if [ -d "$HOME/IsaacLab3" ]; then
+    echo "===== 기존 IsaacLab3 디렉토리 삭제 중 ====="
+    rm -rf ~/IsaacLab3
+fi
+
+# 2. Miniconda 설치 및 기존 Conda 경로 감지
 CONDA_DIR=""
 if [ -d "$HOME/miniconda3" ]; then
     CONDA_DIR="$HOME/miniconda3"
@@ -33,15 +39,14 @@ conda config --set auto_accept_tos yes 2>/dev/null || true
 conda config --add channels conda-forge 2>/dev/null || true
 conda config --set channel_priority strict 2>/dev/null || true
 
-# 2. 시스템 패키지 업데이트 및 기본 도구 설치
+# 3. 시스템 패키지 업데이트 및 기본 도구 설치
 sudo apt update && sudo apt install -y cmake build-essential git git-lfs
 
-# 3. Conda 환경 구축 및 Isaac Lab 설치
+# 4. Conda 환경 구축 및 Isaac Lab 설치
 conda create -y -n isaaclab3 python=3.12
 conda activate isaaclab3
 
 pip install --upgrade pip
-# 의존성 모듈 사전 설치
 pip install lazy_loader
 
 pip install "isaacsim[all,extscache]==6.1.0" --extra-index-url https://pypi.nvidia.com
@@ -52,13 +57,13 @@ git clone --recursive -b release/3.0.0 https://github.com/isaac-sim/IsaacLab Isa
 cd IsaacLab3
 export OMNI_KIT_ACCEPT_EULA=YES
 
-# Isaac Lab 기본 설치
+# Isaac Lab 기본 설치 및 하위 확장 모듈(isaaclab_newton 포함) 전수 editable 설치
 ./isaaclab.sh --install
-
-# 모듈 인식을 위한 확장 패키지 editable 모드 설치 (isaaclab_newton 등 누락 방지)
 pip install -e source/extensions/omni.isaac.lab
 pip install -e source/extensions/omni.isaac.lab_tasks
 pip install -e source/extensions/omni.isaac.lab_assets
+pip install -e source/extensions/omni.isaac.lab_newton 2>/dev/null || true
+pip install -e source/extensions/isaaclab_newton 2>/dev/null || true
 
 echo "===== 설치 완료 ====="
 )
